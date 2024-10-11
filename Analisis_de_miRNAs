@@ -32,6 +32,51 @@ head(Promedio_Genes)
 
 Analisis <- Promedio_Genes %>% 
   mutate(DCT_Cx=Promedio_Genes$Prom_Cx-Promedio_Controles$Prom_Cx,
-         DCT_Tx=Promedio_Genes$Prom_Tx-Promedio_Controles$Prom_Tx,)
+         DCT_Tx=Promedio_Genes$Prom_Tx-Promedio_Controles$Prom_Tx,
+         dosDCT_Cx=2^-(DCT_Cx),
+         dosDCT_Tx=2^-(DCT_Tx),
+         dosDDCT=dosDCT_Tx/dosDCT_Cx)
 Analisis
-head(Analisis)
+head(Analisis)#esto es para ver los seis primeros
+View(Analisis)#me va a llevar a la tabla
+write.csv(Analisis,#base de datos con la que se construyo la tabla
+          file="miRNAs.csv")#es el nombre del archivo
+#########################################################################
+
+#Grafica de puntos 
+Grafica <- ggplot(data=Analisis,
+                  mapping = aes(x=DCT_Cx, 
+                                y=DCT_Tx))+
+  geom_point(size=1,
+             color="29D8A3")+
+  labs(title="Grafica_de_puntos",
+       x="Control (2^-DCT)",
+       y="Tratamiento (2^-DCT)")
+Grafica
+Regresion <- Grafica+ geom_smooth(method="lm",
+                                  alpha=0.05,
+                                  linewidth=1,
+                                  span=1, color="purple")+
+  theme_minimal()
+Regresion
+ggsave("Grafica miRNAs2.jpeg", 
+       plot=Regresion, 
+       width=6, 
+       height = 4, 
+       dpi=50)
+
+grafica_punto2 <- Regresion+
+  theme(axis.text.x=element_text(size=12),
+        axis.text.y = element_text(size=12))+
+  theme(
+    text=element_text(size=12, family="Arial"),
+    axis.title=element_text(size=14, face="bold"),
+    plot.title=element_text(size=16, face="bold"),
+    panel.grid.major = element_line(color="gray", linetype="dotted"),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill="white"),
+    legend.position="bottom",
+    legend.title=element_text(face="bold"),
+    axis.line = element_line(color="black") 
+  )
+grafica_punto2
